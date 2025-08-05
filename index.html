@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expiry Date Calculator</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
+        .container { width: 100%; max-width: 400px; padding: 25px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; text-align: center; margin-top: 0; margin-bottom: 25px; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input[type="date"], select { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 18px; -webkit-appearance: none; appearance: none; background-color: #fff; }
+        .result { margin-top: 30px; padding: 20px; background-color: #e6f7ff; border: 2px solid #91d5ff; border-radius: 8px; text-align: center; }
+        .result-date { font-size: 28px; font-weight: bold; color: #0056b3; letter-spacing: 1px; }
+        .result-label { font-size: 16px; color: #555; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Expiry Calculator</h1>
+
+        <div class="form-group">
+            <label for="mfgDate">1. Manufacturing Date</label>
+            <input type="date" id="mfgDate" required>
+        </div>
+
+        <div class="form-group">
+            <label for="shelfLife">2. Shelf Life</label>
+            <select id="shelfLife">
+                <option value="360">1 Year (360 days)</option>
+                <option value="720" selected>2 Years (720 days)</option>
+                <option value="1080">3 Years (1080 days)</option>
+                <option value="1440">4 Years (1440 days)</option>
+                <option value="1800">5 Years (1800 days)</option>
+            </select>
+        </div>
+        
+        <div id="result" class="result" style="display:none;">
+            <div class="result-label">EXPIRY DATE:</div>
+            <div id="expiryDate" class="result-date"></div>
+        </div>
+    </div>
+
+    <script>
+        const mfgDateInput = document.getElementById('mfgDate');
+        const shelfLifeSelect = document.getElementById('shelfLife');
+        const resultDiv = document.getElementById('result');
+        const expiryDateDiv = document.getElementById('expiryDate');
+
+        // Set default manufacturing date to today for convenience
+        mfgDateInput.valueAsDate = new Date();
+
+        // The core calculation logic
+        function calculateExpiry() {
+            const mfgDateValue = mfgDateInput.value;
+            if (!mfgDateValue) {
+                resultDiv.style.display = 'none';
+                return;
+            }
+
+            // Use T00:00:00 to avoid timezone bugs where a date might be interpreted as the previous day
+            const mfgDate = new Date(mfgDateValue + 'T00:00:00');
+            const daysToAdd = parseInt(shelfLifeSelect.value, 10);
+
+            // The calculation
+            const expiry = new Date(mfgDate.setDate(mfgDate.getDate() + daysToAdd));
+            
+            // Formatting the date to YYYY-MM-DD (ISO 8601 standard)
+            const year = expiry.getFullYear();
+            const month = String(expiry.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(expiry.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            // Displaying the result
+            expiryDateDiv.textContent = formattedDate;
+            resultDiv.style.display = 'block';
+        }
+
+        // Add event listeners to trigger calculation automatically on any change
+        mfgDateInput.addEventListener('change', calculateExpiry);
+        shelfLifeSelect.addEventListener('change', calculateExpiry);
+
+        // Perform an initial calculation when the page first loads
+        calculateExpiry();
+    </script>
+
+</body>
+</html>
